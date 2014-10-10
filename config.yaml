@@ -1,4 +1,9 @@
 options:
+  domain:
+    type: string
+    default: ""
+    description: |
+      Provide registered domain name on which this site responding.
   tuning:
     type: string
     default: "single"

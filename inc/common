@@ -38,33 +38,13 @@ engine()
 	echo `cat .web-engine`
 }
 
-total_memory()
-{
-  echo $((`awk '/MemTotal/{print $2}' /proc/meminfo` / 1024))
-}
-
-apc_shm_size()
-{
-  all_memory=`total_memory`
-  if [ -z $all_memory ]; then
-    echo 256 # Play it safe, no memory was reported.
-    return 0
-  fi
-
-  if [ $all_memory -gt 1280 ]; then
-    echo 1024
-  else
-    echo $((all_memory * 80 / 100))
-  fi
-}
-
 make_bare()
 {
 	# Un-do APC
-  for f in /etc/php5/fpm /etc/php5/cli /etc/php5/apache2; do
-    rm -f "${f}/conf.d/apc.ini"
-  done
-	rm -f /etc/php5/{fpm,cli,apache2}/conf.d/apc.ini
+#  for f in /etc/php5/fpm /etc/php5/cli /etc/php5/apache2; do
+#    rm -f "${f}/conf.d/apc.ini"
+#  done
+#	rm -f /etc/php5/{fpm,cli,apache2}/conf.d/apc.ini
 	# IF there is an NFS mount, get everything out of it
 	if [ -f .nfs-mount ]; then # Looks like someone got fancy with NFS
 		if [ -L $wp_install_path/wp-content ]; then # Check if we actually have a symlink
@@ -81,14 +61,13 @@ make_single()
 {
 	make_bare
 	juju-log "Installing PHP apc.ini ..."
-  for f in /etc/php5/fpm /etc/php5/cli /etc/php5/apache2; do
-    rm -f "${f}/conf.d/apc.ini"
- 	  test -d "$f" && install -o root -g root -m 0644 files/charm/php/php5_conf.d_apc.ini "$f"/conf.d/apc.ini
+ # for f in /etc/php5/fpm /etc/php5/cli /etc/php5/apache2; do
+#    rm -f "${f}/conf.d/apc.ini"
+# 	  test -d "$f" && install -o root -g root -m 0644 files/charm/php/php5_conf.d_apc.ini "$f"/conf.d/apc.ini
+#  	shm_size=`apc_shm_size`
+#	  sed -i -e "s/^apc\.shm_size=.*$/apc.shm_size=${shm_size}M/" "$f"/conf.d/apc.ini
 
-  	shm_size=`apc_shm_size`
-	  sed -i -e "s/^apc\.shm_size=.*$/apc.shm_size=${shm_size}M/" "$f"/conf.d/apc.ini
-
-  done
+#  done
 	## We do NFS here, because Configuration changes cascade. So to get to Optimzied you *must* first 
 	## make "single" (and by association, "bare"). Since nfs is both a single and optimized thing we do it now.
 

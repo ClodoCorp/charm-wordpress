@@ -14,7 +14,8 @@ requires:
     interface: memcache
 provides:
   website:
-    interface: [ http, https ]
+    interface: http
 peers:
   loadbalancer:
-    interface: [ reverse_nginx, reverse_haproxy, reverse_squid ]
+    interface: reversenginx
+
