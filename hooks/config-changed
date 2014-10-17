@@ -57,7 +57,7 @@ if [ "$engine" == "apache" ] || [ "$engine" == "apache2" ]; then
 	sed -i -e "s/# deb \(.*\) multiverse/deb \1 multiverse/g" /etc/apt/sources.list #for libapache2-mod-fastcgi
 	apt-get update
 	apt-get -y purge nginx
-	apt-get install -y apache2-mpm-worker libapache2-mod-fastcgi
+	apt-get --no-install-suggests --no-install-recommends install -y apache2-mpm-worker libapache2-mod-fastcgi
 	service apache2 stop
 
 	rm -f /var/www/index.html
@@ -83,7 +83,7 @@ else
 		service $web_engine stop
 	fi
 	apt-get -y purge apache2* libapache2*
-	apt-get install -y nginx
+	apt-get --no-install-suggests --no-install-recommends install -y nginx
 	service nginx stop
 
 	juju-log "Cleaning any old or default nginx site configs ..."
