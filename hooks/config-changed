@@ -55,17 +55,16 @@ if [ "$engine" == "apache" ] || [ "$engine" == "apache2" ]; then
 		service $web_engine stop
 	fi
 	sed -i -e "s/# deb \(.*\) multiverse/deb \1 multiverse/g" /etc/apt/sources.list #for libapache2-mod-fastcgi
-	apt-get update
 	apt-get -y purge nginx
-	apt-get --no-install-suggests --no-install-recommends install -y apache2-mpm-worker libapache2-mod-fastcgi
+	apt-get --no-install-suggests --no-install-recommends install -y apache2-mpm-prefork libapache2-mod-php5
 	service apache2 stop
 
 	rm -f /var/www/index.html
 
 	rm -f /etc/apache2/sites-enabled/*
-	a2enmod actions fastcgi alias proxy_balancer proxy_http headers
+	a2enmod actions rewrite alias proxy_balancer proxy_http headers php5
 
-	install -o root -g root -m 0644 files/charm/apache/etc_apache2_conf-d_php5-fpm.conf /etc/apache2/conf.d/php5-fpm.conf
+	#install -o root -g root -m 0644 files/charm/apache/etc_apache2_conf-d_php5-fpm.conf /etc/apache2/conf.d/php5-fpm.conf
 
 	juju-log "Installing Apache loadbal config..."
 	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_loadbalancer /etc/apache2/sites-available/loadbalancer
@@ -83,7 +82,7 @@ else
 		service $web_engine stop
 	fi
 	apt-get -y purge apache2* libapache2*
-	apt-get --no-install-suggests --no-install-recommends install -y nginx
+	apt-get --no-install-suggests --no-install-recommends install -y nginx php5-fpm
 	service nginx stop
 
 	juju-log "Cleaning any old or default nginx site configs ..."

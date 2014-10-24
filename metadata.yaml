@@ -6,6 +6,8 @@ description: |
  place Ngnix and php-fpm configured to scale horizontally with Nginx's reverse proxy.
 categories: ["applications"]
 requires:
+  mail:
+    interface: smtp
   db:
     interface: mysql
   nfs:

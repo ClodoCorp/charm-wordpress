@@ -11,6 +11,7 @@ Listen *:8080
   <Directory /var/www>
     Options Indexes FollowSymLinks MultiViews
     AllowOverride All
+    DirectoryIndex index.php
   </Directory>
 
   ErrorLog ${APACHE_LOG_DIR}/wordpress-error.log
