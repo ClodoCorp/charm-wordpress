@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -eu
+#!/bin/sh -ex
 
 juju-log "We've got a db"
 
@@ -21,14 +19,8 @@ if [ -z "$database" ] ; then
 	exit 0
 fi
 
-source "/usr/share/charm-helper/sh/net.sh"
-
-payload=`ch_get_file "https://wordpress.org/latest.tar.gz" "https://wordpress.org/latest.tar.gz.sha1"`
-
-if [ ! -f "$payload" ] || [ -z "$payload" ]; then
-	juju-log "Failed to retrieve latest.tar.gz"
-	exit 1
-fi
+payload="/tmp/wordpress.tar.gz"
+curl -s "https://wordpress.org/latest.tar.gz" > $payload
 
 juju-log "Extract ALL THE FILES!"
 tar -xzf $payload
@@ -36,10 +28,10 @@ tar -xzf $payload
 mkdir -p $wp_install_path
 
 juju-log "Move them in to place, but just 'drop' them in place."
-rsync -az wordpress/ $wp_install_path
+rsync -a wordpress/ $wp_install_path
 
 juju-log "Clean up"
-rm -rf wordpress
+rm -rf wordpress $payload
 
 secret_key=`cat .wp-secret`
 

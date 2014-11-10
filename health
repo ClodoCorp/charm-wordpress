@@ -1,9 +1,0 @@
-#!/bin/bash
-
-curl -L -s http://127.0.0.1 2>&1 | grep -q "Select a default language"
-ret=$?
-if [ $ret -eq 0 ];then
-  echo success;
-else
-  echo failure;
-fi

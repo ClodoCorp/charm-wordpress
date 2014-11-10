@@ -7,8 +7,8 @@ Listen *:8080
   
   UseCanonicalName Off
 
-  DocumentRoot /var/www
-  <Directory /var/www>
+  DocumentRoot /srv/www/htdocs
+  <Directory /srv/www/htdocs>
     Options Indexes FollowSymLinks MultiViews
     AllowOverride All
     DirectoryIndex index.php

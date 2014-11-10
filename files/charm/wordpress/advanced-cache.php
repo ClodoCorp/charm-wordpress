@@ -24,5 +24,5 @@ $wp_ffpc_config = array (
     'version' => '1.1.1',
   ),
 );
-include_once ('/var/www/wordpress/wp-content/plugins/wp-ffpc/wp-ffpc-backend.php');
-include_once ('/var/www/wordpress/wp-content/plugins/wp-ffpc/wp-ffpc-acache.php');
+include_once ('/srv/www/htdocs/wp-content/plugins/wp-ffpc/wp-ffpc-backend.php');
+include_once ('/srv/www/htdocs/wp-content/plugins/wp-ffpc/wp-ffpc-acache.php');

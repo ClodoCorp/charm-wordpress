@@ -1,37 +1,12 @@
-#!/bin/bash
-#
-#    common - Common functions
-#
-#    Copyright (C) 2012  Marco Ceppi
-#    Author: Marco Ceppi <marco@ceppi.net>
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+#!/bin/sh -ex
 
 hostname=`unit-get public-address`
 private_name=`hostname --all-fqdns | cut -f 1 -d ' '`
 
-wp_install_path="/var/www"
+wp_install_path="/srv/www/htdocs"
 config_file_path="$wp_install_path/wp-config.php"
 config_info_path="$wp_install_path/wp-info.php"
 config_override_path="$wp_install_path/wp-overrides.php"
-
-####
-## The only hook who should ever remove the NFS mount is the nfs-relation-(departed|broken) hook
-## Everyone else should just assume it's there or try to mount it. We don't want to loose people's
-## data, they get mad when that happens :(
-####
 
 engine()
 {
@@ -61,17 +36,6 @@ make_single()
 {
 	make_bare
 	juju-log "Installing PHP apc.ini ..."
- # for f in /etc/php5/fpm /etc/php5/cli /etc/php5/apache2; do
-#    rm -f "${f}/conf.d/apc.ini"
-# 	  test -d "$f" && install -o root -g root -m 0644 files/charm/php/php5_conf.d_apc.ini "$f"/conf.d/apc.ini
-#  	shm_size=`apc_shm_size`
-#	  sed -i -e "s/^apc\.shm_size=.*$/apc.shm_size=${shm_size}M/" "$f"/conf.d/apc.ini
-
-#  done
-	## We do NFS here, because Configuration changes cascade. So to get to Optimzied you *must* first 
-	## make "single" (and by association, "bare"). Since nfs is both a single and optimized thing we do it now.
-
-	do_nfs
 
 	juju-log "We are now single, ALL THE SINGLE UNITS ALL THE SINGLE UNITS"
 }
@@ -84,33 +48,6 @@ make_optimized()
 define('DISALLOW_FILE_MODS', TRUE);
 EOF
 	juju-log "We are now optimized prime"
-}
-
-do_nfs()
-{
-	if [ -f .nfs-mount ]; then
-		# This has all the NFS mount stuff in it
-		source .nfs-mount
-		mkdir -p /mnt/wordpress
-		if grep -qs '/mnt/wordpress' /proc/mounts; then
-			juju-log "We're already mounted."
-		else
-			mount -t $MOUNT_TYPE $MOUNT_OPS $MOUNT_SERVER:$MOUNT_PATH /mnt/wordpress
-			if [ $? -ne 0 ]; then
-				juju-log "Could not connect to file-server"
-				exit 1 # OH THE HUMANITY OF IT ALL
-			fi
-			if [ ! -d /mnt/wordpress/wp-content ]; then
-				rsync -az $wp_install_path/wp-content /mnt/wordpress/
-			fi
-
-			mv $wp_install_path/wp-content $wp_install_path/wp-content.bak.$(date +%Y%m%d-%H%M%S) && rm -rf $wp_install_path/wp-content
-			ln -s /mnt/wordpress/wp-content $wp_install_path
-			juju-log "Mounted NFS"
-		fi
-	else
-		juju-log "There is no nfs mount, not sure what to do, so we'll just bail"
-	fi
 }
 
 do_vcs()
@@ -194,6 +131,6 @@ do_cache()
 
 	engine=`cat .web-engine`
 	if [ "$engine" == "nginx" ]; then
-		sed -i -e "s/memcached_pass .*/memcached_pass $CACHE_HOST\:$CACHE_PORT;/" /etc/nginx/sites-enabled/wordpress
+		sed -i -e "s/memcached_pass .*/memcached_pass $CACHE_HOST\:$CACHE_PORT;/" /etc/nginx/sites-available/wordpress
 	fi
 }
