@@ -10,8 +10,6 @@ requires:
     interface: smtp
   db:
     interface: mysql
-  nfs:
-    interface: mount
   cache:
     interface: memcache
 provides:

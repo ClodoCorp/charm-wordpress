@@ -3,7 +3,6 @@
 source inc/common
 
 tuning_level=`config-get tuning`
-wp_content_repo=`config-get wp-content`
 expose_info=`config-get debug`
 engine=`config-get engine`
 unit_address=`unit-get private-address`
@@ -101,11 +100,7 @@ else
 	exit 1
 fi
 
-do_vcs $wp_content_repo
-
-if [ -z "$wp_content_repo" ]; then
-	wp plugin update --path=$wp_install_path --all
-fi
+wp plugin update --path=$wp_install_path --all
 
 do_cache
 
