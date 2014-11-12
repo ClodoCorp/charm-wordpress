@@ -71,7 +71,7 @@ do_cache()
 		$wp_install_path/wp-content/advanced-cache.php
 
 	engine=`cat .web-engine`
-	if [ "$engine" == "nginx" ]; then
+	if [ "x${engine}" = "xnginx" ]; then
 		sed -i -e "s/memcached_pass .*/memcached_pass $CACHE_HOST\:$CACHE_PORT;/" /etc/nginx/sites-available/wordpress.conf
 	fi
 }
