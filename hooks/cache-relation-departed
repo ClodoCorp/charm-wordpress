@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/bin/sh -ex
 
-set -eu
-
-source inc/common
+. inc/common
 
 if [ ! -f .memcache ]; then
 	juju-log "I guess we've already done this..."
@@ -13,4 +11,4 @@ rm -f .memcache
 
 juju-log "Fairwell memcache, fairwell memcache"
 
-. hooks/config-changed
+hooks/config-changed

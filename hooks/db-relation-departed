@@ -1,5 +1,5 @@
 #!/bin/sh -ex
 
-source inc/common
+. inc/common
 
 rm -f $config_file_path

@@ -1,20 +1,5 @@
-#!/bin/bash
+#!/bin/sh -ex
 
-set -xe
-
-if [[ -d exec.d ]]; then
-    shopt -s nullglob
-    for f in exec.d/*/charm-pre-install; do
-    [[ -x "$f" ]] || continue
-    ${SHELL} -c "$f"|| {
-        ## bail out if anyone fails
-        juju-log -l ERROR "$f: returned exit_status=$? "
-        exit 1
-    }
-    done
-fi
-
-add-apt-repository ppa:charmers/charm-helpers
 apt-get update
 
 apt-get --no-install-suggests --no-install-recommends -y install php5-memcache mysql-client pwgen php5 \

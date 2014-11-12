@@ -1,4 +1,4 @@
 #!/bin/sh -ex
 
 engine=`cat .web-engine`
-service $engine restart
+service $engine status || service $engine start

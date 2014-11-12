@@ -35,8 +35,6 @@ make_bare()
 make_single()
 {
 	make_bare
-	juju-log "Installing PHP apc.ini ..."
-
 	juju-log "We are now single, ALL THE SINGLE UNITS ALL THE SINGLE UNITS"
 }
 
@@ -50,63 +48,6 @@ EOF
 	juju-log "We are now optimized prime"
 }
 
-do_vcs()
-{
-	source "/usr/share/charm-helper/bash/vcs.bash"
-
-	local NEW_REPO_URL=${1:-""}
-
-	if [ -z "$NEW_REPO_URL" ]; then
-		rm -f .wp-repo
-		return 0
-	fi
-
-	if [ -f .wp-repo ]; then
-		source .wp-repo
-	else
-		REPO_URL=""
-	fi
-
-	if [ "$NEW_REPO_URL" != "$REPO_URL" ]; then
-		# We need to determine what kind of URL this is
-
-		repo_path=`ch_fetch_repo $NEW_REPO_URL`
-		if [ $? -ne 0 ]; then
-			juju-log "Failed to fetch repo, charm-helper/bash/vcs.bash exited with $?"
-			return 1
-		fi
-
-		# Write all our new data to disk
-		cat > .wp-repo <<EOF
-#!/bin/bash
-REPO_URL=$NEW_REPO_URL
-REPO_PATH=$repo_path
-EOF
-		source .wp-repo # Just so the rest of this can run all willy nilly
-	else
-		# Lets just try and do a fetch
-		ch_update_repo "$REPO_PATH"
-		if [ $? -ne 0 ]; then
-			juju-log "Failed to update repository, charm-helper/bash/vcs.bash exited with $?"
-			return 2
-		fi
-	fi
-
-	repo_type=`ch_detect_vcs $REPO_PATH`
-
-	if [ ! -d "$REPO_PATH/wp-content" ]; then
-		# This is just someone who has their source control at the root level of the repo.
-		wp_content_path="$REPO_PATH/wp-content"
-		rsync -az --delete --exclude ".$repo_type/*" $REPO_PATH/ $wp_install_path/wp-content/
-	else
-		# This is a repo with a wp-content folder. So we'll move that then everything else they have in that repo
-		# to the web root. OMG requirement.
-		rsync -az --delete --exclude ".$repo_type/*" $REPO_PATH/wp-content/ $wp_install_path/wp-content/
-		# This is just incase people have modifications outside of the wp-content directory
-		rsync -az --exclude ".$repo_type/*" $REPO_PATH/ $wp_install_path/
-	fi
-}
-
 do_cache()
 {
 	if [ ! -f .memcache ]; then
@@ -118,7 +59,7 @@ do_cache()
 		return 0
 	fi
 
-	source .memcache
+	. .memcache
 
 	wp plugin install --path=$wp_install_path wp-ffpc
 	sed -i -e "s/'host'=>.*/'host'=>'$CACHE_HOST',/" $wp_install_path/wp-content/plugins/wp-ffpc/wp-ffpc.php
@@ -131,6 +72,6 @@ do_cache()
 
 	engine=`cat .web-engine`
 	if [ "$engine" == "nginx" ]; then
-		sed -i -e "s/memcached_pass .*/memcached_pass $CACHE_HOST\:$CACHE_PORT;/" /etc/nginx/sites-available/wordpress
+		sed -i -e "s/memcached_pass .*/memcached_pass $CACHE_HOST\:$CACHE_PORT;/" /etc/nginx/sites-available/wordpress.conf
 	fi
 }

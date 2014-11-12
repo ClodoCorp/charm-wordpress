@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-source inc/common
+. inc/common
 
 secret_key=`relation-get secret-key`
 

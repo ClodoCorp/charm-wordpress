@@ -1,4 +1,4 @@
 #!/bin/sh -ex
 
-. hooks/stop
-. hooks/start
+hooks/stop
+hooks/start

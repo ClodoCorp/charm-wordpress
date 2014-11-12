@@ -9,6 +9,11 @@
   ServerAdmin webmaster@localhost
 
   DocumentRoot /srv/www/htdocs
+<Directory /srv/>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+</Directory>
   <Directory /srv/www/htdocs>
     Options Indexes FollowSymLinks MultiViews
     AllowOverride All

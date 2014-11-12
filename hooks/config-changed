@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-source inc/common
+. inc/common
 
 tuning_level=`config-get tuning`
 expose_info=`config-get debug`
@@ -28,12 +28,12 @@ if [ "$engine" == "apache" ] || [ "$engine" == "apache2" ]; then
 	a2enmod actions rewrite alias headers php5
 
 	juju-log "Installing Apache loadbal config..."
-	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_loadbalancer /etc/apache2/sites-available/loadbalancer
-	sed -i -e "s/^  ServerName .*/  ServerName ${unit_address}/" /etc/apache2/sites-available/loadbalancer
+	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_loadbalancer /etc/apache2/sites-available/loadbalancer.conf
+	sed -i -e "s/^  ServerName .*/  ServerName ${unit_address}/" /etc/apache2/sites-available/loadbalancer.conf
 	a2ensite loadbalancer
 
 	juju-log "Installing Apache wordpress config..."
-	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_wordpress /etc/apache2/sites-available/wordpress
+	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_wordpress /etc/apache2/sites-available/wordpress.conf
 	a2ensite wordpress
 
 	echo "apache2" > .web-engine
@@ -71,7 +71,7 @@ fi
 hooks/loadbalancer-rebuild
 
 juju-log "Restarting Services ..."
-source hooks/restart
+hooks/restart
 
 if [ ! -f $config_file_path ]; then
 	juju-log "Nothing to configure, since nothing is installed"
@@ -106,4 +106,4 @@ do_cache
 
 chown -R www-data.www-data $wp_install_path
 
-. hooks/restart
+hooks/restart

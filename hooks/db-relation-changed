@@ -2,7 +2,7 @@
 
 juju-log "We've got a db"
 
-source inc/common
+. inc/common
 
 if [ -f "$config_file_path" ]; then
 	# No longer to quietly in to that good night. Update the wp-config file with new DB values
@@ -20,18 +20,12 @@ if [ -z "$database" ] ; then
 fi
 
 payload="/tmp/wordpress.tar.gz"
-curl -s "https://wordpress.org/latest.tar.gz" > $payload
+curl -L -s "https://wordpress.org/latest.tar.gz" > $payload
 
 juju-log "Extract ALL THE FILES!"
-tar -xzf $payload
-
 mkdir -p $wp_install_path
-
-juju-log "Move them in to place, but just 'drop' them in place."
-rsync -a wordpress/ $wp_install_path
-
-juju-log "Clean up"
-rm -rf wordpress $payload
+tar -C $wp_install_path -xzf $payload
+rm -rf $payload
 
 secret_key=`cat .wp-secret`
 
@@ -85,8 +79,8 @@ juju-log "Resetting permissions"
 
 chown -R www-data.www-data $wp_install_path
 
-. hooks/config-changed
-. hooks/restart
+hooks/config-changed
+hooks/restart
 
 # Make it publicly visible, once the wordpress service is exposed
 open-port 80/tcp

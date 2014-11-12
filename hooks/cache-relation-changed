@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh -ex
 
 memcache_host=`relation-get private-address`
 memcache_port=`relation-get port`
@@ -13,4 +13,4 @@ CACHE_PORT=$memcache_port
 
 EOF
 
-source hooks/config-changed
+hooks/config-changed
