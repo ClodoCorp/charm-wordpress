@@ -4,7 +4,8 @@ maintainer: Vasiliy Tolstov <v.tolstov@selfip.ru>
 description: |
  This will install and setup WordPress optimized to run in the cloud. By default it will 
  place Ngnix and php-fpm configured to scale horizontally with Nginx's reverse proxy.
-categories: ["applications"]
+tags:
+  - applications
 requires:
   mail:
     interface: smtp
