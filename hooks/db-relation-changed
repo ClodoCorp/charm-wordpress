@@ -23,6 +23,8 @@ payload="/tmp/wordpress.tar.gz"
 curl -L -s "https://wordpress.org/latest.tar.gz" > $payload
 
 juju-log "Extract ALL THE FILES!"
+tar -xzf $payload
+
 mkdir -p $wp_install_path
 tar -C $wp_install_path --strip-components=1 -xzf $payload
 rm -rf $payload

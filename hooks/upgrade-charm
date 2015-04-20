@@ -1,5 +1,6 @@
 #!/bin/sh -ex
 
+# Run the install again!
 hooks/install
 
 wp_install_path="/srv/www/htdocs"

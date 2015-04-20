@@ -1,16 +1,17 @@
 name: wordpress
-summary: "WordPress is a full featured web blogging tool"
-maintainer: Vasiliy Tolstov <v.tolstov@selfip.ru>
+summary: "WordPress is a full featured web blogging tool, this charm deploys it."
+maintainer: Marco Ceppi <marco@ceppi.net>
 description: |
  This will install and setup WordPress optimized to run in the cloud. By default it will 
  place Ngnix and php-fpm configured to scale horizontally with Nginx's reverse proxy.
-tags:
-  - applications
+categories: ["applications"]
 requires:
   mail:
     interface: smtp
   db:
     interface: mysql
+  nfs:
+    interface: mount
   cache:
     interface: memcache
 provides:
@@ -19,4 +20,3 @@ provides:
 peers:
   loadbalancer:
     interface: reversenginx
-

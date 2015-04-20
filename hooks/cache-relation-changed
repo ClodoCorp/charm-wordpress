@@ -6,6 +6,11 @@ memcache_port=${memcache_port:-11211}
 
 rm -f .memcache
 
+if [ -z $memcache_port ]; then
+    juju-log "Info hasn't been received from the instance yet, exiting silently"
+    exit 0
+fi
+
 cat > .memcache <<EOF
 #!/bin/bash
 CACHE_HOST=$memcache_host

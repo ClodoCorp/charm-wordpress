@@ -3,7 +3,6 @@
 . inc/common
 
 tuning_level=`config-get tuning`
-expose_info=`config-get debug`
 engine=`config-get engine`
 unit_address=`unit-get private-address`
 
@@ -18,7 +17,6 @@ if [ "x${engine}" = "xapache" -o "x${engine}" = "xapache2" ]; then
 
   mkdir -p /srv/www/htdocs
 
-  rm -f /etc/apache2/sites-available/*
 	rm -f /etc/apache2/sites-enabled/*
 	a2enmod actions rewrite alias headers php5
 
@@ -31,6 +29,12 @@ if [ "x${engine}" = "xapache" -o "x${engine}" = "xapache2" ]; then
 	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_wordpress /etc/apache2/sites-available/wordpress.conf
 	a2ensite wordpress
 
+	# Wordpress users usually use mod_rewrite. Altough it's being enabled
+	# here, it's not used by default. But, if the user changes the
+	# permalinks to something that needs mod_rewrite, wordpress will
+	# automatically create a /var/www/.htaccess to enable it
+	a2enmod rewrite
+
 	echo "apache2" > .web-engine
 else
 	if [ -f .web-engine ]; then
@@ -42,7 +46,6 @@ else
 	service nginx stop
 
 	juju-log "Cleaning any old or default nginx site configs ..."
-  rm -f /etc/nginx/sites-available/*
 	rm -f /etc/nginx/sites-enabled/*
 	rm -f /etc/nginx/conf.d/*
 
@@ -60,9 +63,13 @@ else
 	install -o root -g root -m 0644 files/charm/nginx/etc_nginx_sites-enabled_loadbalancer /etc/nginx/sites-available/loadbalancer
 	ln -sf ../sites-available/loadbalancer /etc/nginx/sites-enabled/loadbalancer
 
+	juju-log "Moving nginx var dirs to /mnt storage ..."
+	rsync -az /var/lib/nginx /mnt/ && rm -rf /var/lib/nginx && ln -s /mnt/nginx /var/lib/
+
 	echo "nginx" > .web-engine
 fi
 
+# http://i.imgur.com/TUF91.gif
 hooks/loadbalancer-rebuild
 
 juju-log "Restarting Services ..."

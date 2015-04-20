@@ -5,7 +5,7 @@ server {
   server_name _;
   access_log /mnt/access.log;
   error_log /mnt/error.log;
-  root   /var/www/;
+  root   /srv/www/htdocs;
   index index.php index.html;
   client_max_body_size    50m;
   client_body_buffer_size 128k;
@@ -30,7 +30,8 @@ server {
   }
 
   location / {
-    try_files $uri $uri/ @memcache;
+    index index.php index.html index.htm;
+    try_files $uri $uri/ @memcache /index.php?$args;
   }
 
   location ~ /\. {
