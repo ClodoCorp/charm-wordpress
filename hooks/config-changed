@@ -11,7 +11,6 @@ if [ "x${engine}" = "xapache" -o "x${engine}" = "xapache2" ]; then
 		web_engine=`cat .web-engine`
 		service $web_engine stop
 	fi
-	apt-get -y purge nginx
 	apt-get --no-install-suggests --no-install-recommends install -y apache2-mpm-prefork libapache2-mod-php5
 	service apache2 stop
 
@@ -19,11 +18,6 @@ if [ "x${engine}" = "xapache" -o "x${engine}" = "xapache2" ]; then
 
 	rm -f /etc/apache2/sites-enabled/*
 	a2enmod actions rewrite alias headers php5
-
-	juju-log "Installing Apache loadbal config..."
-	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_loadbalancer /etc/apache2/sites-available/loadbalancer.conf
-	sed -i -e "s/^  ServerName .*/  ServerName ${unit_address}/" /etc/apache2/sites-available/loadbalancer.conf
-	a2ensite loadbalancer
 
 	juju-log "Installing Apache wordpress config..."
 	install -o root -g root -m 0644 files/charm/apache/etc_apache2_sites-enabled_wordpress /etc/apache2/sites-available/wordpress.conf
@@ -58,19 +52,11 @@ else
 	install -o root -g root -m 0644 files/charm/nginx/etc_nginx_sites-enabled_wordpress /etc/nginx/sites-available/wordpress
 	ln -sf ../sites-available/wordpress /etc/nginx/sites-enabled/wordpress
 
-	juju-log "Installing nginx loadbal config ..."
-	rm -f /etc/nginx/sites-available/loadbalancer
-	install -o root -g root -m 0644 files/charm/nginx/etc_nginx_sites-enabled_loadbalancer /etc/nginx/sites-available/loadbalancer
-	ln -sf ../sites-available/loadbalancer /etc/nginx/sites-enabled/loadbalancer
-
 	juju-log "Moving nginx var dirs to /mnt storage ..."
 	rsync -az /var/lib/nginx /mnt/ && rm -rf /var/lib/nginx && ln -s /mnt/nginx /var/lib/
 
 	echo "nginx" > .web-engine
 fi
-
-# http://i.imgur.com/TUF91.gif
-hooks/loadbalancer-rebuild
 
 juju-log "Restarting Services ..."
 hooks/restart

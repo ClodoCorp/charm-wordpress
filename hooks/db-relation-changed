@@ -14,6 +14,7 @@ database=`relation-get database`
 user=`relation-get user`
 password=`relation-get password`
 host=`relation-get private-address`
+host=127.0.0.1
 
 if [ -z "$database" ] ; then
 	exit 0
@@ -84,6 +85,7 @@ chown -R www-data.www-data $wp_install_path
 hooks/config-changed
 hooks/restart
 
-# Make it publicly visible, once the wordpress service is exposed
+## Make it publicly visible, once the wordpress service is exposed
+juju-log "Opening port 80"
 open-port 80/tcp
-open-port 443/tcp
+#open-port 443/tcp
